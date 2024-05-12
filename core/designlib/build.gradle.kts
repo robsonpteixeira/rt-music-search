@@ -1,3 +1,3 @@
 plugins {
-    id("convention.android.feature")
+    id("convention.android.designlib")
 }
