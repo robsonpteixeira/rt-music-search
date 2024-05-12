@@ -8,7 +8,9 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
-class AndroidFeatureConventionPlugin : Plugin<Project> {
+private const val s = "retrofit-main"
+
+class AndroidNetworkConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             with(pluginManager) {
@@ -16,13 +18,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 apply("convention.hilt")
             }
             extensions.configure<LibraryExtension> {
-                configureAndroidCompose(this)
                 dependencies {
-                    add("implementation", versionCatalog.findLibrary("hilt-navigation-compose").get())
-                    add("implementation", versionCatalog.findLibrary("retrofit-main").get())
-                    add("implementation", versionCatalog.findLibrary("moshi-main").get())
-                    add("kapt", versionCatalog.findLibrary("moshi-codegen").get())
-                    add("implementation", versionCatalog.findLibrary("coroutines").get())
+                    add("implementation", versionCatalog.findBundle("network").get())
                 }
             }
         }

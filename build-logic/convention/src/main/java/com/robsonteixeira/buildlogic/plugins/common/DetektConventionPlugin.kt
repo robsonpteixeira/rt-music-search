@@ -10,7 +10,7 @@ class DetektConventionPlugin : Plugin<Project> {
         with(project) {
             pluginManager.apply("io.gitlab.arturbosch.detekt")
             extensions.configure<DetektExtension> {
-                config = files("$rootDir/tools/detekt/detekt-config.yml")
+                config.setFrom(files("$rootDir/tools/detekt/detekt-config.yml"))
             }
         }
     }

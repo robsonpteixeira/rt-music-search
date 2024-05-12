@@ -38,6 +38,14 @@ gradlePlugin {
             id = "convention.android.library"
             implementationClass = "com.robsonteixeira.buildlogic.plugins.AndroidLibConventionPlugin"
         }
+        register("androidDesignLib") {
+            id = "convention.android.designlib"
+            implementationClass = "com.robsonteixeira.buildlogic.plugins.AndroidDesignLibConventionPlugin"
+        }
+        register("androidNetwork") {
+            id = "convention.android.network"
+            implementationClass = "com.robsonteixeira.buildlogic.plugins.AndroidNetworkConventionPlugin"
+        }
         register("androidFeature") {
             id = "convention.android.feature"
             implementationClass = "com.robsonteixeira.buildlogic.plugins.AndroidFeatureConventionPlugin"
