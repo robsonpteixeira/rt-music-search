@@ -11,6 +11,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         with(project) {
             with(pluginManager) {
                 apply("convention.android.library")
+                apply("convention.hilt")
             }
             extensions.configure<LibraryExtension> {
                 configureAndroidCompose(this)

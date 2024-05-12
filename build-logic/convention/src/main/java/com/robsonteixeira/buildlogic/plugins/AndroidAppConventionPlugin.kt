@@ -15,6 +15,7 @@ class AndroidAppConventionPlugin : Plugin<Project> {
                 apply("com.android.application")
                 apply("kotlin-android")
                 apply("convention.detekt")
+                apply("convention.hilt")
             }
             extensions.configure<ApplicationExtension> {
                 defaultConfig.apply {

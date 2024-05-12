@@ -42,5 +42,9 @@ gradlePlugin {
             id = "convention.android.feature"
             implementationClass = "com.robsonteixeira.buildlogic.plugins.AndroidFeatureConventionPlugin"
         }
+        register("hilt") {
+            id = "convention.hilt"
+            implementationClass = "com.robsonteixeira.buildlogic.plugins.HiltConventionPlugin"
+        }
     }
 }
