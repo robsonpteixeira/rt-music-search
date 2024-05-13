@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screen_details_error_title_text">Something went wrong.</string>
+    <string name="screen_details_error_button_text">Try again</string>
+    <string name="screen_details_topbar_title_text">Music Details</string>
+    <string name="screen_details_image_description_text">Music Image</string>
+    <string name="screen_details_link_button_text">Link</string>
+</resources>
