@@ -2,6 +2,7 @@ package com.robsonteixeira.musicsearch.features.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.robsonteixeira.musicsearch.core.analytics.AnalyticsEventTracker
 import com.robsonteixeira.musicsearch.features.search.data.repository.SearchRepository
 import com.robsonteixeira.musicsearch.features.search.data.repository.model.SearchItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SearchViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
+    private val analyticsEventTracker: AnalyticsEventTracker,
 ): ViewModel() {
 
     private val _state = MutableStateFlow<UiState>(UiState.Empty)
@@ -25,6 +27,10 @@ internal class SearchViewModel @Inject constructor(
 
     private val _effect = MutableSharedFlow<Effect>()
     val effect = _effect.asSharedFlow()
+
+    init {
+        analyticsEventTracker.trackEvent(SearchAnalytics.getScreenView())
+    }
 
     fun search() {
         if (_searchQuery.value.isBlank()) {
@@ -54,13 +60,26 @@ internal class SearchViewModel @Inject constructor(
     }
 
     fun onClick(id: String) {
+        analyticsEventTracker.trackEvent(SearchAnalytics.getItemClick(id))
         viewModelScope.launch {
             _effect.emit(Effect.NavigateToDetails(id))
         }
     }
 
     private fun setState(updatedObject: UiState) {
+        sendEventState(updatedObject)
         _state.value = updatedObject
+    }
+
+    private fun sendEventState(updatedObject: UiState) {
+        analyticsEventTracker.trackEvent(
+            when(updatedObject) {
+                UiState.Empty -> SearchAnalytics.getEmpty()
+                UiState.Error -> SearchAnalytics.getError()
+                is UiState.Loaded -> SearchAnalytics.getLoaded()
+                UiState.Loading -> SearchAnalytics.getLoading()
+            }
+        )
     }
 
     internal sealed class UiState {

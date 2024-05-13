@@ -1,10 +1,14 @@
 package com.robsonteixeira.musicsearch.features.search.presentation
 
 import app.cash.turbine.test
+import com.robsonteixeira.musicsearch.core.analytics.AnalyticsEventTracker
+import com.robsonteixeira.musicsearch.core.analytics.model.AnalyticsEvent
 import com.robsonteixeira.musicsearch.features.search.data.repository.SearchRepository
 import com.robsonteixeira.musicsearch.features.search.data.repository.model.SearchItem
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -14,6 +18,8 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+
+private const val SCREEN_NAME = "search_screen"
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class SearchViewModelTest {
@@ -30,7 +36,11 @@ internal class SearchViewModelTest {
 
     private val searchRepository = mockk<SearchRepository>()
 
-    private val viewModel = SearchViewModel(searchRepository)
+    private val analyticsEventTracker = mockk<AnalyticsEventTracker> {
+        every { trackEvent(any()) } returns Unit
+    }
+
+    private val viewModel = SearchViewModel(searchRepository, analyticsEventTracker)
 
     private val list = listOf(
         SearchItem(
@@ -45,6 +55,10 @@ internal class SearchViewModelTest {
 
         val expected = SearchViewModel.UiState.Empty
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "empty"))
+        }
     }
 
     @Test
@@ -55,6 +69,10 @@ internal class SearchViewModelTest {
 
         val expected = SearchViewModel.UiState.Loaded(list)
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "loaded"))
+        }
     }
 
     @Test
@@ -65,6 +83,10 @@ internal class SearchViewModelTest {
 
         val expected = SearchViewModel.UiState.Empty
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "empty"))
+        }
     }
 
     @Test
@@ -75,6 +97,10 @@ internal class SearchViewModelTest {
 
         val expected = SearchViewModel.UiState.Error
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "error"))
+        }
     }
 
     @Test
@@ -83,12 +109,15 @@ internal class SearchViewModelTest {
 
         viewModel.onQueryChanged("0")
 
-        val expected = SearchViewModel.Effect.NavigateToDetails("")
+        val expected = SearchViewModel.Effect.NavigateToDetails("aa")
 
         viewModel.effect.test {
-            viewModel.onClick("")
+            viewModel.onClick("aa")
             val item = awaitItem()
             Assert.assertEquals(expected, item)
+        }
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "item_click:aa"))
         }
     }
 }

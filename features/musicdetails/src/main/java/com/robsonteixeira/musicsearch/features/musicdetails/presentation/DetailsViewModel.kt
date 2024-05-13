@@ -3,6 +3,7 @@ package com.robsonteixeira.musicsearch.features.musicdetails.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.robsonteixeira.musicsearch.core.analytics.AnalyticsEventTracker
 import com.robsonteixeira.musicsearch.features.musicdetails.data.repository.DetailsRepository
 import com.robsonteixeira.musicsearch.features.musicdetails.data.repository.model.DetailsItem
 import com.robsonteixeira.musicsearch.features.musicdetails.navigation.ARG_ID
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DetailsViewModel @Inject constructor(
     private val detailsRepository: DetailsRepository,
+    private val analyticsEventTracker: AnalyticsEventTracker,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -29,6 +31,7 @@ internal class DetailsViewModel @Inject constructor(
     val effect = _effect.asSharedFlow()
 
     init {
+        analyticsEventTracker.trackEvent(DetailsAnalytics.getScreenView())
         search()
     }
 
@@ -49,13 +52,25 @@ internal class DetailsViewModel @Inject constructor(
     }
 
     fun onClick(src: String) {
+        analyticsEventTracker.trackEvent(DetailsAnalytics.getSrcClick(src))
         viewModelScope.launch {
             _effect.emit(Effect.NavigateToSource(src))
         }
     }
 
     private fun setState(updatedObject: UiState) {
+        sendEventState(updatedObject)
         _state.value = updatedObject
+    }
+
+    private fun sendEventState(updatedObject: UiState) {
+        analyticsEventTracker.trackEvent(
+            when(updatedObject) {
+                UiState.Error -> DetailsAnalytics.getError()
+                is UiState.Loaded -> DetailsAnalytics.getLoaded()
+                UiState.Loading -> DetailsAnalytics.getLoading()
+            }
+        )
     }
 
     internal sealed class UiState {

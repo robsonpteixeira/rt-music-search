@@ -2,11 +2,14 @@ package com.robsonteixeira.musicsearch.features.musicdetails.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.robsonteixeira.musicsearch.core.analytics.AnalyticsEventTracker
+import com.robsonteixeira.musicsearch.core.analytics.model.AnalyticsEvent
 import com.robsonteixeira.musicsearch.features.musicdetails.data.repository.DetailsRepository
 import com.robsonteixeira.musicsearch.features.musicdetails.data.repository.model.DetailsItem
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -16,6 +19,8 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+
+private const val SCREEN_NAME = "details_screen"
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DetailsViewModelTest {
@@ -31,6 +36,10 @@ internal class DetailsViewModelTest {
     }
 
     private val detailsRepository = mockk<DetailsRepository>()
+
+    private val analyticsEventTracker = mockk<AnalyticsEventTracker> {
+        every { trackEvent(any()) } returns Unit
+    }
 
     private val savedStateHandle = mockk<SavedStateHandle> {
         every { get<String>("id") } returns "0"
@@ -52,6 +61,10 @@ internal class DetailsViewModelTest {
 
         val expected = DetailsViewModel.UiState.Error
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "error"))
+        }
     }
 
     @Test
@@ -62,6 +75,10 @@ internal class DetailsViewModelTest {
 
         val expected = DetailsViewModel.UiState.Loaded(details)
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "loaded"))
+        }
     }
 
     @Test
@@ -72,6 +89,10 @@ internal class DetailsViewModelTest {
 
         val expected = DetailsViewModel.UiState.Error
         Assert.assertEquals(expected, viewModel.state.value)
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "error"))
+        }
     }
 
     @Test
@@ -80,16 +101,20 @@ internal class DetailsViewModelTest {
 
         initViewModel()
 
-        val expected = DetailsViewModel.Effect.NavigateToSource("")
+        val expected = DetailsViewModel.Effect.NavigateToSource("aa")
 
         viewModel.effect.test {
-            viewModel.onClick("")
+            viewModel.onClick("aa")
             val item  = awaitItem()
             Assert.assertEquals(expected, item)
+        }
+        verify {
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "screen_view"))
+            analyticsEventTracker.trackEvent(AnalyticsEvent(SCREEN_NAME, "src:aa"))
         }
     }
 
     private fun initViewModel() {
-        viewModel = DetailsViewModel(detailsRepository, savedStateHandle)
+        viewModel = DetailsViewModel(detailsRepository, analyticsEventTracker, savedStateHandle)
     }
 }
