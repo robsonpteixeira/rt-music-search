@@ -5,4 +5,6 @@ plugins {
 
 dependencies {
     implementation(project(":core:designlib"))
+    implementation(project(":features:musicdetails"))
+    implementation(project(":features:search"))
 }
