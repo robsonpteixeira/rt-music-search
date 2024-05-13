@@ -1,4 +1,4 @@
-package com.robsonteixeira.musicsearch.features.search.data.di
+package com.robsonteixeira.musicsearch.features.search.di
 
 import com.robsonteixeira.musicsearch.core.network.di.OpenwhydRetrofit
 import com.robsonteixeira.musicsearch.features.search.data.repository.SearchRepository
