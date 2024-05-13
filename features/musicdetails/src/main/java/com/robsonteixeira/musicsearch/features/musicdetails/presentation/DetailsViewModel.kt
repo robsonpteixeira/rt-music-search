@@ -37,6 +37,7 @@ internal class DetailsViewModel @Inject constructor(
             setState(UiState.Error)
             return
         }
+        setState(UiState.Loading)
         viewModelScope.launch {
             detailsRepository.getDetails(id).runCatching {
                 val details = getOrThrow()
