@@ -23,6 +23,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                     add("implementation", versionCatalog.findLibrary("moshi-main").get())
                     add("kapt", versionCatalog.findLibrary("moshi-codegen").get())
                     add("implementation", versionCatalog.findLibrary("coroutines").get())
+                    add("implementation", versionCatalog.findLibrary("collections-immutable").get())
                     add("testImplementation", versionCatalog.findLibrary("androidx-arch-test").get())
                     add("testImplementation", versionCatalog.findLibrary("coroutines-test").get())
                     add("testImplementation", versionCatalog.findLibrary("turbine").get())

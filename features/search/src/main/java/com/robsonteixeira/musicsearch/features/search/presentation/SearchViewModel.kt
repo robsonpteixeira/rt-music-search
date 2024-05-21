@@ -6,6 +6,8 @@ import com.robsonteixeira.musicsearch.core.analytics.AnalyticsEventTracker
 import com.robsonteixeira.musicsearch.features.search.data.repository.SearchRepository
 import com.robsonteixeira.musicsearch.features.search.data.repository.model.SearchItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -47,7 +49,7 @@ internal class SearchViewModel @Inject constructor(
                     return@launch
                 }
 
-                setState(UiState.Loaded(list))
+                setState(UiState.Loaded(list.toImmutableList()))
             }.onFailure {
                 setState(UiState.Error)
             }
@@ -86,7 +88,7 @@ internal class SearchViewModel @Inject constructor(
         data object Loading : UiState()
         data object Error : UiState()
         data object Empty : UiState()
-        data class Loaded(val list: List<SearchItem>) : UiState()
+        data class Loaded(val list: ImmutableList<SearchItem>) : UiState()
     }
 
     internal sealed class Effect {
